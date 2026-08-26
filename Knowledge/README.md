@@ -13,8 +13,9 @@ Two note types:
 
 ### Topics
 
-*(empty)*
+- [Showcase Demand Graph (concepts-v4.1)](demand-graph.md) — what the 200k-term concept graph is, its measured quality, and how to read its numbers
+- [Search-term clustering methodology](clustering-methodology-lessons.md) — which levers actually move cluster precision, LLM-judge calibration, and the v5 bake-off verdict
 
 ### Pipelines
 
-*(empty)*
+- [Demand Graph build](pipelines/demand-graph-build.md) — search-term export → versioned concept graph on S3/GitHub, with gates, fleets, and failure modes
