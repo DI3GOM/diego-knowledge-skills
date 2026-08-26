@@ -69,7 +69,12 @@ sources:
   like compression-not-separation. Cohen's d showed all three contenders
   statistically indistinguishable (0.56–0.59) vs BGE's 0.30. Any cross-model
   comparison of raw similarity values is a scale artifact until standardized
-  or rank-based.
+  or rank-based. The project hit this twice: the v1 catalog match already had
+  to treat e5 similarity scores as rank-only for the same reason.
+- **Small embedding models create lexical attractors.** e5-small grouped terms
+  on a shared surface word ("Pink items", "Green items") rather than intent.
+  Detectable by eye, fixable only partially by bigger models — the durable fix
+  was naming them "(lexical)" and excluding them downstream.
 - **A failure taxonomy is worth more than the failure rate.** 0.687 precision
   sounds mediocre until you learn all 47 errors were same-theme resolution
   errors, zero cross-category — the graph is never *wrong*, sometimes *coarse*.

@@ -10,6 +10,7 @@ sources:
   - s3://mantis4retail-proto-428156589460-us-east-1/processed/showcase/demand-graph/runs/concepts-v4.1/
   - ~/DemandGraph_work/validation/ (per-version scorecards + panel results)
   - GitHub release demand-graph-v4 (Mantis4Real/Mantis4Retail-Repo)
+  - Seafile Archive/Diego/Demand_Graph_Build_2026-08-19/ (v1 deliverables + README with known limitations)
 ---
 
 # Showcase Demand Graph (concepts-v4.1)
@@ -68,6 +69,11 @@ sources:
   same weeks prior year). One observed period exists (`2026-08-05`) — drift,
   churn, velocity, and any forward-scoring are **unmeasurable until a second
   release lands**. Trend labels are descriptive, never validated predictive.
+- Facets: 2,389 Spanish-driven terms flagged at v1; brand / IP / audience /
+  language facets carried on every term since.
+- Product layer lineage: v1 matched 13,209 products (1,626 Showcase + 11,583
+  TikTok Shop) to fine-cluster centroids with a head-noun acceptance gate —
+  68% accepted (9,023). Superseded by the v4.1 assignment below.
 - Product layer: 7,358 products (Showcase US/CA, MINISO, Five Below) assigned
   to micro niches — 95.2% assigned, QA precision **0.953 ± 0.034**.
   Cross-retailer signal: Showcase-only niches include squishies (97 products)
@@ -94,11 +100,19 @@ sources:
 ## Pitfalls & misconceptions
 
 - **Don't read v4.1's top-trending list as insight** — built in August it
-  re-detects back-to-school. Use the deseasonalized view; even that is
-  label-based, not a baseline model.
+  re-detects back-to-school (v1's raw radar top was literally JanSport
+  backpacks, 81% trending). Use `deseasonalized_trending` — defined as
+  trending AND >50% of the cluster's terms above their last-year same-period
+  baseline — but know it is label-based, not a baseline model.
 - **Micro-niche IDs are not stable across versions** (seed stability is
-  inherently low at that granularity). Serve micro niches via their theme +
-  lineage, never by bare ID comparison across versions.
+  inherently low at that granularity). Council ruling from v1 stands: cluster
+  IDs are internal and disposable — month-over-month reporting keys on
+  taxonomy categories, brands, and IPs, which are stable. Serve micro niches
+  via their theme + lineage, never by bare ID comparison across versions.
+- **Lexical-attractor clusters** ("Pink items", "Green items"): embeddings can
+  group on a shared surface word (a color) rather than intent — endemic with
+  the small v1 model, reduced but not eliminated by BGE-M3 + gating. They are
+  marked "(lexical)" in names precisely so they can be filtered.
 - **12,712 expelled terms and 353 unassigned products exist.** Any coverage
   claim ("every term sits in a niche") must footnote them.
 - **The held-out co-click metric is structurally unfair to gated graphs** —

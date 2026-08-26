@@ -8,6 +8,7 @@ sources:
   - Mantis4Retail-Repo:Mantis4Retail/analysis/demand-graph/ (branch diego/demand-graph-explorer — pipeline/step0–step9, validation.py, README.md)
   - Mantis4Retail-Repo:Mantis4Retail/analysis/demand-graph/docs/PROJECT_CHRONICLE.md
   - ~/DemandGraph_work/ (checkpoints_v3, checkpoints_v4, out_v4, product_assign, validation)
+  - Seafile Archive/Diego/Demand_Graph_Build_2026-08-19/ (v1 deliverables: README, STATUS.md, ACCEPTANCE_RESULTS.txt)
 ---
 
 # Demand Graph build
@@ -35,7 +36,7 @@ sources:
 |---|---|---|
 | 0 | Dedup (`step0`) | 200k raw terms → normalize/accent-fold/token-key merge + ASIN-confirmed typo merges → 170,796 canonicals |
 | 1 | Embed (`step1`) | canonicals → BGE-M3 dense CLS, 1024-d, MPS → `embeddings.npy` |
-| 2 | Graph (`step2`) | embeddings + clicks → FAISS kNN (k=16, calibrated sim threshold) fused with co-click edges (α 0.7/0.3) → `edges_fused.parquet` (~1.28M edges) |
+| 2 | Graph (`step2`) | embeddings + clicks → FAISS kNN (k=16, calibrated sim threshold) fused with co-click edges (α 0.7/0.3) → `edges_fused.parquet` (v1: 1.96M edges incl. 221k co-click pairs; v3 gated: ~1.28M) |
 | 2b | Gate | fused edges → head-noun agreement + modifier-compatibility filter → `edges_gated.parquet` |
 | 3 | Cluster (`step7`) | gated graph → Leiden micro (res 1024 tier) → purification removals applied via env → micro niches |
 | 3b | Hierarchy (`step3b`) | micro niches → fine-first meta-aggregation (cluster the meta-graph of clusters; singleton-penalty resolution pick) → themes → coarse |
@@ -56,7 +57,10 @@ sources:
   hidden known-positives/negatives (100% neg accuracy, 97.5% pos recall)
   before being trusted to grade anything.
 - **Acceptance checks before computation:** write the check first; the v1
-  overnight run's probe caught a 1-cluster Leiden collapse this way.
+  overnight run's gate caught a 1-cluster Leiden collapse this way
+  (`ACCEPTANCE_RESULTS.txt`: all-terms-present / no-null-cluster /
+  count-sane / all-named). Checkpoint everything expensive (dedup,
+  embeddings, graph) so a caught failure costs a re-cluster, not a rebuild.
 - **Resolution selection:** probe a ladder, score with singleton-share
   penalty; never trust a single resolution value across data changes.
 - **Sample before full run** — every fleet (purify, naming, product
