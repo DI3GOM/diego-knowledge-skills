@@ -18,4 +18,8 @@ Knowledge/
 
 <!-- One "### Theme" heading per theme folder; one line per note: - [Name](theme-slug/note.md) — hook -->
 
-*(empty — add your first note with the extracting-knowledge skill)*
+### Demand Graph
+
+- [Showcase Demand Graph (concepts-v4.1)](demand-graph/demand-graph.md) — what the 200k-term concept graph is, its measured quality, and how to read its numbers
+- [Search-term clustering methodology](demand-graph/clustering-methodology-lessons.md) — which levers actually move cluster precision, LLM-judge calibration, and the v5 bake-off verdict
+- [Demand Graph build (pipeline)](demand-graph/pipeline-demand-graph-build.md) — search-term export → versioned concept graph on S3/GitHub, with gates, fleets, and failure modes
