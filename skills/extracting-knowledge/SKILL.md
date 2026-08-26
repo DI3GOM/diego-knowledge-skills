@@ -42,7 +42,8 @@ Every load-bearing fact (numbers, dates, quotes, version-specific claims) must b
 
 ### 5. Write the note
 
-Save to `Knowledge/<topic-slug>.md` in the knowledge repo (ask for the location only if no `Knowledge/` folder is findable). Use this template:
+Save to the knowledge repo: `/Users/diegomndzuz/Desktop/diego-knowledge-skills/Knowledge/<topic-slug>.md`.
+If that path doesn't exist (different machine), fall back to a `Knowledge/` folder in the current repo, and ask only if neither is findable. Use this template:
 
 ```markdown
 ---
