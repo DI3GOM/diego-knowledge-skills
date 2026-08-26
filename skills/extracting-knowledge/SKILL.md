@@ -15,10 +15,19 @@ Pick by what's being captured: *understanding of a subject* → topic note; *how
 ## Where notes live
 
 Knowledge repo: `/Users/diegomndzuz/Desktop/diego-knowledge-skills/Knowledge/`
-- Topic notes: `Knowledge/<topic-slug>.md`
-- Pipeline notes: `Knowledge/pipelines/<pipeline-slug>.md`
 
-If that path doesn't exist (different machine), fall back to a `Knowledge/` folder in the current repo; ask only if neither is findable. After writing, add a one-line entry to `Knowledge/README.md`: `- [Name](path.md) — one-line hook`.
+Notes are grouped by **theme** — one folder per broad area, holding everything about it (its topic notes and its pipeline notes together):
+
+```
+Knowledge/
+└── <theme-slug>/                  # e.g. demand-graph/
+    ├── <topic-slug>.md            # topic notes for this theme
+    └── pipeline-<slug>.md         # pipeline notes for this theme
+```
+
+Before writing, list the existing theme folders and reuse one if the note belongs there — create a new theme only when none fits. Themes are broad areas ("demand-graph", "llm-tooling"), not one folder per note; if a theme folder would hold a single note forever, the theme is too narrow. If the repo path doesn't exist (different machine), fall back to a `Knowledge/` folder in the current repo; ask only if neither is findable.
+
+After writing, update the index in `Knowledge/README.md`: one `### <Theme>` heading per theme folder, one line per note under it — `- [Name](theme-slug/note.md) — one-line hook`.
 
 ## Shared principles
 
@@ -100,3 +109,4 @@ sources:
 
 - **Conversation capture:** when distilling the current conversation, sources are the artifacts discussed (files, links, tool outputs) — cite those, not "this conversation".
 - **Pipelines drift.** When updating a pipeline note after the process changes, note what changed and when — stale stage descriptions are worse than none.
+- **Moving a note between themes** is fine as understanding evolves — move the file, fix the index, and fix any links pointing at it.
