@@ -1,62 +1,51 @@
 ---
 name: extracting-knowledge
-description: Extract and distill the most important knowledge about a topic into a structured, source-grounded note saved in the Knowledge/ folder. Use whenever the user wants to learn, research, summarize, or capture the essentials of a subject — "extract the key knowledge about X", "distill this", "add X to my knowledge base", "what do I need to know about X" — or wants findings from the current conversation preserved as a knowledge note, even if they don't say "knowledge" explicitly.
+description: Capture knowledge into the Knowledge/ folder as structured, source-grounded notes — topic notes distilling the essentials of a subject, and pipeline notes registering important information pipelines or processes (where information comes from, how it flows and is transformed, and the knowledge extracted from it). Use whenever the user wants to learn, research, summarize, or capture the essentials of a subject — "extract the key knowledge about X", "distill this", "add X to my knowledge base" — or wants to document, register, or map a process, workflow, or information/data pipeline — "register this pipeline", "document this process", "capture how this works" — or wants findings from the current conversation preserved, even without the word "knowledge".
 ---
 
 # Extracting Knowledge
 
-Turn a topic, source, or conversation into a compact knowledge note that captures the ~20% of ideas that give ~80% of the understanding, with every load-bearing fact traceable to a source.
+Capture knowledge as compact, source-grounded notes in the knowledge repo. Two note types:
 
-## Workflow
+- **Topic note** — distills a subject into the ~20% of ideas that give ~80% of the understanding.
+- **Pipeline note** — registers an important information pipeline or process: what feeds it, how information flows and is transformed at each stage, and the knowledge it produces.
 
-### 1. Scope the topic
+Pick by what's being captured: *understanding of a subject* → topic note; *how information moves through a repeatable process* → pipeline note. A pipeline whose output taught you something general may warrant both — the pipeline note links to the topic note.
 
-Before gathering anything, pin down:
-- **The question behind the topic** — what does the user actually want to be able to do or decide with this knowledge?
-- **Depth** — orientation overview vs. working knowledge vs. deep reference
-- **Angle** — e.g. "Kubernetes" for an app developer is a different note than for a platform engineer
+## Where notes live
 
-If the topic is broad and the angle is unclear, ask one short clarifying question. Otherwise proceed with a stated assumption.
+Knowledge repo: `/Users/diegomndzuz/Desktop/diego-knowledge-skills/Knowledge/`
+- Topic notes: `Knowledge/<topic-slug>.md`
+- Pipeline notes: `Knowledge/pipelines/<pipeline-slug>.md`
 
-### 2. Gather
+If that path doesn't exist (different machine), fall back to a `Knowledge/` folder in the current repo; ask only if neither is findable. After writing, add a one-line entry to `Knowledge/README.md`: `- [Name](path.md) — one-line hook`.
 
-- Start from model knowledge to build the skeleton: core concepts, standard mental models, known trade-offs.
-- Use web search when the topic is fast-moving, when specific numbers/dates/versions are load-bearing, or when your knowledge may be stale. Prefer primary sources (official docs, papers, announcements) over blog summaries.
-- If the user provided sources (files, URLs, this conversation), those are the primary material — read them fully before distilling.
+## Shared principles
 
-### 3. Distill
+- **Scope first.** Pin down the question behind the request — what should the reader be able to do or decide with this note? Ask one short clarifying question only if the angle is genuinely ambiguous; otherwise state your assumption and proceed.
+- **Ground everything.** Every load-bearing fact (numbers, dates, quotes, version-specific claims, stage behaviors) must trace to a listed source. Verify or mark `(unverified)` — never silently include facts you're unsure of.
+- **Update, don't duplicate.** Check for an existing note on the subject and extend it instead of creating a near-copy.
+- **Absolute dates.** Write "as of 2026-08", never "currently" or "recently".
+- **Omit empty sections; target 100–300 lines.** A note that tries to be complete fails at being useful.
 
-Apply a hard priority filter. For each candidate item ask: *would an expert consider this essential, or merely true?* Keep only:
+## Topic notes
 
-- **Core concepts** — the handful of ideas everything else hangs on
-- **Mental models** — how experts think about the domain (analogies, framings, invariants)
-- **Key facts** — numbers, limits, dates, names that change decisions
-- **Pitfalls & misconceptions** — what beginners get wrong; counterintuitive truths
-- **Open questions** — what is unsettled or worth researching next
-
-Cut background, history, and anything the reader could trivially re-derive. A note that tries to be complete fails at being useful.
-
-### 4. Ground
-
-Every load-bearing fact (numbers, dates, quotes, version-specific claims) must be backed by a listed source. If you can't source it and it matters, either verify it or mark it explicitly as `(unverified)`. Never silently include facts you are unsure of.
-
-### 5. Write the note
-
-Save to the knowledge repo: `/Users/diegomndzuz/Desktop/diego-knowledge-skills/Knowledge/<topic-slug>.md`.
-If that path doesn't exist (different machine), fall back to a `Knowledge/` folder in the current repo, and ask only if neither is findable. Use this template:
+1. **Gather** — model knowledge for the skeleton; web search when the topic is fast-moving or specific facts are load-bearing (prefer primary sources). User-provided sources (files, URLs, this conversation) are primary material — read fully before distilling.
+2. **Distill** — for each candidate item ask: *would an expert consider this essential, or merely true?* Keep core concepts, mental models, key facts, pitfalls & misconceptions, open questions. Cut background and anything trivially re-derivable.
 
 ```markdown
 ---
-topic: <Human-readable topic name>
+type: topic
+topic: <Human-readable name>
 date: <YYYY-MM-DD>
 angle: <one line — for whom / for what purpose>
 sources:
-  - <url or file — one per line>
+  - <url or file>
 ---
 
 # <Topic>
 
-> **In one paragraph:** <the whole topic compressed to 3–5 sentences>
+> **In one paragraph:** <the whole topic in 3–5 sentences>
 
 ## Core concepts
 ## Mental models
@@ -65,14 +54,49 @@ sources:
 ## Open questions
 ```
 
-Omit sections that would be empty rather than padding them. Target 100–300 lines: long enough to be self-sufficient, short enough to be re-read.
+## Pipeline notes
 
-### 6. Index
+Registering a pipeline means a reader (or agent) can afterwards understand it, run it, or debug it without re-discovering it. Capture the process *and* what running it has taught you:
 
-Add or update a one-line entry in `Knowledge/README.md`: `- [Topic](topic-slug.md) — one-line hook`.
+1. **Map the flow** — sources/inputs, then each stage as *input → transformation → output*, naming the tools/systems involved. Real observed behavior beats the intended design; if they differ, that difference is a gotcha worth recording.
+2. **Capture the judgment** — decision points, quality checks, and failure modes are where the real knowledge lives; a bare step list is re-derivable, the judgment behind it is not.
+3. **Extract the knowledge** — what the pipeline's outputs have actually taught you. If that knowledge outgrows the note, move it to a topic note and link it.
+
+```markdown
+---
+type: pipeline
+pipeline: <Human-readable name>
+date: <YYYY-MM-DD>
+purpose: <one line — what question or decision this pipeline serves>
+cadence: <on demand | daily | per release | …>
+sources:
+  - <url, file, or system>
+---
+
+# <Pipeline name>
+
+> **In one paragraph:** what goes in, what comes out, and why it matters.
+
+## Inputs
+<where the information comes from — systems, feeds, documents, people>
+
+## Stages
+<one subsection or table row per stage: input → transformation (tool) → output>
+
+## Decision points & quality checks
+<where judgment is applied; what "good" looks like at each gate>
+
+## Outputs & consumers
+<what is produced and who/what uses it>
+
+## Failure modes & gotchas
+<how it breaks, how you notice, what to do>
+
+## Knowledge extracted
+<key learnings produced by this pipeline so far — or links to topic notes>
+```
 
 ## Gotchas
 
-- **Updating beats duplicating.** Before writing, check `Knowledge/` for an existing note on the topic and extend it instead of creating `topic-2.md`.
-- **Conversation capture:** when distilling the current conversation, the sources are the artifacts discussed (files, links, tool outputs) — cite those, not "this conversation".
-- **Relative dates rot.** Write "as of 2026-08" not "currently" or "recently".
+- **Conversation capture:** when distilling the current conversation, sources are the artifacts discussed (files, links, tool outputs) — cite those, not "this conversation".
+- **Pipelines drift.** When updating a pipeline note after the process changes, note what changed and when — stale stage descriptions are worse than none.
