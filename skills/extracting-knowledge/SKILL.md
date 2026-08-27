@@ -5,108 +5,55 @@ description: Capture knowledge into the Knowledge/ folder as structured, source-
 
 # Extracting Knowledge
 
-Capture knowledge as compact, source-grounded notes in the knowledge repo. Two note types:
+Capture knowledge as compact, grounded notes in the knowledge repo. Two note types:
 
 - **Topic note** — distills a subject into the ~20% of ideas that give ~80% of the understanding.
-- **Pipeline note** — registers an important information pipeline or process: what feeds it, how information flows and is transformed at each stage, and the knowledge it produces.
+- **Pipeline note** — registers an information pipeline or process: what feeds it, how information flows and transforms per stage, and the knowledge it produces.
 
-Pick by what's being captured: *understanding of a subject* → topic note; *how information moves through a repeatable process* → pipeline note. A pipeline whose output taught you something general may warrant both — the pipeline note links to the topic note.
+Pick by what's captured: *understanding of a subject* → topic; *how information moves through a repeatable process* → pipeline. Templates for both are in `references/templates.md` — read it before writing a note.
 
-## Where notes live
+## Repo layout
 
-Knowledge repo: `/Users/diegomndzuz/Desktop/diego-knowledge-skills/Knowledge/`
-
-Notes are grouped by **theme** — one folder per broad area, holding everything about it (its topic notes and its pipeline notes together):
+Knowledge repo: `/Users/diegomndzuz/Desktop/diego-knowledge-skills/Knowledge/` (fallback: a `Knowledge/` folder in the current repo; ask only if neither is findable).
 
 ```
 Knowledge/
-└── <theme-slug>/                  # e.g. demand-graph/
-    ├── <topic-slug>.md            # topic notes for this theme
-    └── pipeline-<slug>.md         # pipeline notes for this theme
+├── README.md                      # human-facing index: one table per theme
+├── log.md                         # append-only ingest log
+└── <theme-slug>/                  # one folder per broad area, e.g. demand-graph/
+    ├── raw/YYYY-MM-DD-<slug>.md   # IMMUTABLE source snapshots — never edit or delete
+    ├── <topic-slug>.md            # topic notes
+    └── pipeline-<slug>.md         # pipeline notes
 ```
 
-Before writing, list the existing theme folders and reuse one if the note belongs there — create a new theme only when none fits. Themes are broad areas ("demand-graph", "llm-tooling"), not one folder per note; if a theme folder would hold a single note forever, the theme is too narrow. If the repo path doesn't exist (different machine), fall back to a `Knowledge/` folder in the current repo; ask only if neither is findable.
+Themes are broad ("demand-graph", "llm-tooling") — reuse an existing theme folder before creating one; a theme that would hold a single note forever is too narrow. **Name notes so the path is guessable from a question about them** — agents retrieve by inferring paths and grepping, not by reading the index; the filename is the retrieval surface.
 
-After writing, update the index in `Knowledge/README.md`: one `### <Theme>` heading per theme folder, one line per note under it — `- [Name](theme-slug/note.md) — one-line hook`.
+## The grounding invariant
 
-## Shared principles
+Every load-bearing fact in a note — numbers, dates, direct quotes — must exist **verbatim** in the `raw/` files that note links. This makes truthfulness a grep-checkable property instead of a hope:
 
-- **Scope first.** Pin down the question behind the request — what should the reader be able to do or decide with this note? Ask one short clarifying question only if the angle is genuinely ambiguous; otherwise state your assumption and proceed.
-- **Ground everything.** Every load-bearing fact (numbers, dates, quotes, version-specific claims, stage behaviors) must trace to a listed source. Verify or mark `(unverified)` — never silently include facts you're unsure of.
-- **Update, don't duplicate.** Check for an existing note on the subject and extend it instead of creating a near-copy.
-- **Absolute dates.** Write "as of 2026-08", never "currently" or "recently".
-- **Omit empty sections; target 100–300 lines.** A note that tries to be complete fails at being useful.
+- **Snapshot sources first.** Before writing a note, save each substantive source (fetched page content, report, transcript, key excerpts of a conversation) as `raw/YYYY-MM-DD-<slug>.md`. Raw files are immutable — a verified note stays verified. A URL alone is attribution, not grounding: pages change, and a link says nothing about whether the fact is really there.
+- **Locate before you write.** Find each value in the raw file before writing it, and write it exactly as found — if the source says 42K, write 42K, not 42,000. Derived values (sums, deltas) must show their components. Can't locate it? Drop it, state it without precision, or mark it `(unverified)`.
+- **Lint:** run `scripts/check_evidence.py <Knowledge-dir>` to verify the whole corpus — it greps each note's high-signal literals (quotes, dates, specific numbers) into its linked raws and reports misses. Report-only: never auto-fix facts.
 
-## Topic notes
+## Workflow
 
-1. **Gather** — model knowledge for the skeleton; web search when the topic is fast-moving or specific facts are load-bearing (prefer primary sources). User-provided sources (files, URLs, this conversation) are primary material — read fully before distilling.
-2. **Distill** — for each candidate item ask: *would an expert consider this essential, or merely true?* Keep core concepts, mental models, key facts, pitfalls & misconceptions, open questions. Cut background and anything trivially re-derivable.
+1. **Triage.** Search existing notes (and `log.md`) for the subject's key entities and synonyms, then decide: **New** note / **Update** existing / **Disputed** (conflicts with existing — see below) / **No material** (adds nothing beyond what's already held: keep the raw, log it, stop — never force a note out of a thin source).
+2. **Gather.** Model knowledge for the skeleton; web search when facts are load-bearing or fast-moving; prefer primary sources. For any claim you expect to conclude, **deliberately search the opposing side** — failures, criticism, contradicting reports.
+3. **Distill.** Keep only what an expert would call essential, not merely true. Then run a densification pass: list salient entities/numbers present in the sources but missing from the draft, and fuse them in *without growing the note* — blandness is low specificity per line. Every key fact needs a number, name, date, or mechanism.
+4. **Write** using the template. ≤120 lines; the first line after the title is a one-paragraph summary. Split on overflow rather than compressing — repeated self-compression flattens detail.
+5. **Log & index.** Append to `log.md`: `## [YYYY-MM-DD] ingest | <title> — Disposition: New|Update|Disputed|No material`, with raw path and any other notes updated. Update the theme's table in `README.md` (`| Note | One-line summary | Updated |`).
+6. **Cascade.** Don't stop at the index — grep the whole `Knowledge/` tree for the source's key entities and update every note the new information materially affects.
 
-```markdown
----
-type: topic
-topic: <Human-readable name>
-date: <YYYY-MM-DD>
-angle: <one line — for whom / for what purpose>
-sources:
-  - <url or file>
----
+## Keeping notes truthful over time
 
-# <Topic>
-
-> **In one paragraph:** <the whole topic in 3–5 sentences>
-
-## Core concepts
-## Mental models
-## Key facts
-## Pitfalls & misconceptions
-## Open questions
-```
-
-## Pipeline notes
-
-Registering a pipeline means a reader (or agent) can afterwards understand it, run it, or debug it without re-discovering it. Capture the process *and* what running it has taught you:
-
-1. **Map the flow** — sources/inputs, then each stage as *input → transformation → output*, naming the tools/systems involved. Real observed behavior beats the intended design; if they differ, that difference is a gotcha worth recording.
-2. **Capture the judgment** — decision points, quality checks, and failure modes are where the real knowledge lives; a bare step list is re-derivable, the judgment behind it is not.
-3. **Extract the knowledge** — what the pipeline's outputs have actually taught you. If that knowledge outgrows the note, move it to a topic note and link it.
-
-```markdown
----
-type: pipeline
-pipeline: <Human-readable name>
-date: <YYYY-MM-DD>
-purpose: <one line — what question or decision this pipeline serves>
-cadence: <on demand | daily | per release | …>
-sources:
-  - <url, file, or system>
----
-
-# <Pipeline name>
-
-> **In one paragraph:** what goes in, what comes out, and why it matters.
-
-## Inputs
-<where the information comes from — systems, feeds, documents, people>
-
-## Stages
-<one subsection or table row per stage: input → transformation (tool) → output>
-
-## Decision points & quality checks
-<where judgment is applied; what "good" looks like at each gate>
-
-## Outputs & consumers
-<what is produced and who/what uses it>
-
-## Failure modes & gotchas
-<how it breaks, how you notice, what to do>
-
-## Knowledge extracted
-<key learnings produced by this pipeline so far — or links to topic notes>
-```
+- Frontmatter carries two dates: `updated` (content last changed) and `verified` (human last confirmed accuracy). `verified` never predates `updated`; the gap between them is the staleness signal.
+- **Never silently rewrite history.** When new information contradicts a note, keep the old claim and mark it with a dated `> **Status: Outdated**` block saying what changed, per the template. Competing live claims get `> **Status: Disputed**` with each position attributed.
+- **Conflicting sources: never average.** State that sources disagree and why, then give each position its own lines with its conditions. A blended midpoint is a fabricated number.
+- Absolute dates always ("as of 2026-08", never "currently").
 
 ## Gotchas
 
-- **Conversation capture:** when distilling the current conversation, sources are the artifacts discussed (files, links, tool outputs) — cite those, not "this conversation".
-- **Pipelines drift.** When updating a pipeline note after the process changes, note what changed and when — stale stage descriptions are worse than none.
-- **Moving a note between themes** is fine as understanding evolves — move the file, fix the index, and fix any links pointing at it.
+- **Conversation capture:** sources are the artifacts discussed (files, links, tool outputs) — snapshot those into `raw/`, don't cite "this conversation".
+- **Pipeline notes must separate observed from hypothesized** — a failure mode with a date and evidence is knowledge; one you imagined is a guess. The template enforces this.
+- **Moving a note between themes** is fine — move the file, fix the index and inbound links.
