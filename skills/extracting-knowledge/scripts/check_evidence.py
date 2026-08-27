@@ -20,6 +20,11 @@ import re
 import sys
 from pathlib import Path
 
+
+def norm(text: str) -> str:
+    """Collapse whitespace so line-wrapped text matches across files."""
+    return re.sub(r'\s+', ' ', text)
+
 DATE_RE = re.compile(r'\b\d{4}-\d{2}(?:-\d{2})?\b')
 NUM_RE = re.compile(r'\b\d{1,3}(?:,\d{3})+\b|\b\d+\.\d[\d.]*\b|\b\d+(?:\.\d+)?\s?[KkMmBb%]\b|\b\d{4,}\b')
 QUOTE_RE = re.compile(r'"([^"\n]{15,})"')
@@ -28,8 +33,10 @@ QUOTE_RE = re.compile(r'"([^"\n]{15,})"')
 def literals(body: str) -> set[str]:
     out = set()
     for line in body.splitlines():
-        if line.lstrip().startswith('>') and len(line.lstrip('> ').strip()) >= 15:
-            out.add(line.lstrip('> ').strip())
+        stripped = line.lstrip('> ').strip()
+        if (line.lstrip().startswith('>') and len(stripped) >= 15
+                and not stripped.startswith(('**In one paragraph:**', '**Status:'))):
+            out.add(stripped)
         out.update(QUOTE_RE.findall(line))
         out.update(DATE_RE.findall(line))
         out.update(NUM_RE.findall(line))
@@ -75,10 +82,10 @@ def main(root: Path) -> None:
             else:
                 referenced.add(rp)
                 raw_texts.append(rp.read_text(encoding='utf-8'))
-        corpus = '\n'.join(raw_texts)
+        corpus = norm('\n'.join(raw_texts))
         body = re.sub(r'^---\n.*?\n---', '', text, flags=re.S)
         for lit in sorted(literals(body)):
-            if lit not in corpus:
+            if norm(lit) not in corpus:
                 print(f'[not in raw]    {rel}: {lit!r}')
                 problems += 1
 
