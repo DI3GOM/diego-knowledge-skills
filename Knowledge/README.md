@@ -44,3 +44,9 @@ python3 ../skills/extracting-knowledge/scripts/check_evidence.py .
 | Note | One-line summary | Updated |
 |---|---|---|
 | [llm-maintained-knowledge-bases](llm-knowledge-bases/llm-maintained-knowledge-bases.md) | How LLM-maintained knowledge bases succeed (grounding invariant) and fail (confidently-wrong rot) | 2026-08-27 |
+
+### Claude Code tooling
+
+| Note | One-line summary | Updated |
+|---|---|---|
+| [ecc-everything-claude-code](claude-code-tooling/ecc-everything-claude-code.md) | ECC plugin: what it is, global no-hooks install on this Mac, which `/ecc:*` command for which case | 2026-09-22 |
